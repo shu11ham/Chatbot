@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Frontend Chat</title>
+</head>
+<body>
+    <h1>Frontend Debug Test</h1>
+    <div>
+        <input type="text" id="messageInput" placeholder="Type a message..." value="Hello test">
+        <button onclick="sendTestMessage()">Send Message</button>
+    </div>
+    <div id="response"></div>
+
+    <script>
+    async function sendTestMessage() {
+        const message = document.getElementById('messageInput').value;
+        const responseDiv = document.getElementById('response');
+        
+        try {
+            responseDiv.innerHTML = 'Sending...';
+            
+            const response = await fetch('/api/chat/message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    message: message,
+                    sessionId: 'debug-frontend-session'
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            responseDiv.innerHTML = `
+                <h3>Success!</h3>
+                <p><strong>Response:</strong> ${data.response}</p>
+                <p><strong>Session ID:</strong> ${data.sessionId}</p>
+                <p><strong>Timestamp:</strong> ${data.timestamp}</p>
+            `;
+        } catch (error) {
+            responseDiv.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            console.error('Error:', error);
+        }
+    }
+    </script>
+</body>
+</html>
